@@ -1,0 +1,22 @@
+name: release-drafter
+
+on:
+  push:
+    # Draft the next release on every merge to main. The draft is updated
+    # in place; humans publish it (or push a tag) when ready.
+    branches: [main]
+  # Allow manual trigger from the Actions tab for one-off refreshes.
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update_release_draft:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Draft the next release notes
+        uses: release-drafter/release-drafter@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

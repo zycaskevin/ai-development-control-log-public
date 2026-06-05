@@ -1,0 +1,58 @@
+name: validate
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # fetch all branches so `git diff main..HEAD` resolves.
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Validate repository structure
+        run: python scripts/validate.py
+      - name: Run unit tests
+        run: |
+          python -m pip install --quiet pytest pyyaml
+          python -m pytest tests/ -v
+      - name: Run script smoke
+        run: |
+          python -m pip install --quiet pyyaml
+          # In a fresh PR checkout only the PR branch is present, so
+          # use `origin/main` as the base ref. If main doesn't exist
+          # (fork PR), fall back to HEAD~1.
+          if git rev-parse --verify origin/main >/dev/null 2>&1; then
+            BASE=origin/main
+          else
+            BASE=HEAD~1
+          fi
+          echo "Using BASE=$BASE"
+          python scripts/collect_evidence.py --base "$BASE" > /tmp/collect_evidence_smoke.md
+          grep -q "9.5.1 Changed Files" /tmp/collect_evidence_smoke.md
+          grep -q "9.5.3 Test Result" /tmp/collect_evidence_smoke.md
+          python scripts/collect_evidence.py --base "$BASE" --json | python -c "import json,sys; json.load(sys.stdin)"
+          # v0.3 scripts: rollback + touchpoint. Use HEAD for the
+          # revert target (it must be a real commit, not a ref like
+          # origin/main that may not exist in fork PRs).
+          python scripts/collect_rollback_evidence.py > /tmp/rollback_smoke.md
+          grep -q "9.5.7 Rollback Evidence" /tmp/rollback_smoke.md
+          python scripts/detect_high_risk_touchpoints.py > /tmp/touchpoint_smoke.md
+          grep -q "9.5.6 High-Risk Touchpoints" /tmp/touchpoint_smoke.md
+          # v0.3.1 script: actor metadata. Use a deterministic env
+          # so the smoke is reproducible.
+          HERMES_AGENT_MODEL=ci-smoke-agent \
+            HERMES_TASK_ID=ci-smoke \
+            python scripts/collect_actor_metadata.py > /tmp/actor_smoke.md
+          grep -q "Agent model" /tmp/actor_smoke.md
+          grep -q "ci-smoke-agent" /tmp/actor_smoke.md
+          grep -q "<FILL BY HAND>" /tmp/actor_smoke.md
+          # JSON mode
+          HERMES_AGENT_MODEL=ci-smoke-agent \
+            python scripts/collect_actor_metadata.py --json | \
+            python -c "import json,sys; d=json.load(sys.stdin); assert d['agent_model']=='ci-smoke-agent'; assert d['human_approver']==''"

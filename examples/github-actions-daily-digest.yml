@@ -1,0 +1,54 @@
+name: Daily AI Decision Digest
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Example only: enable intentionally in your own repo.
+    - cron: '0 10 * * 1-5'
+
+permissions:
+  contents: read
+
+jobs:
+  build-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build local-only digest artifact
+        run: |
+          mkdir -p logs/daily
+          DIGEST="logs/daily/$(date -u +%Y-%m-%d).zh-TW.md"
+          {
+            echo '# 每日 AI 決策摘要'
+            echo
+            echo '## 0. 語言與讀者設定'
+            echo
+            echo '| 欄位 | 值 |'
+            echo '|---|---|'
+            echo '| 輸出語言 | zh-TW |'
+            echo '| 讀者 | founder / internal team |'
+            echo '| 語氣 | 白話高層摘要 |'
+            echo
+            echo '## 1. 今天 AI 自己做了哪些決定？'
+            echo
+            echo '- TODO: fill from task control logs / PR summaries.'
+            echo
+            echo '## 2. 今天有沒有偏離原本規格？'
+            echo
+            echo '- TODO.'
+            echo
+            echo '## 3. 今天哪些是真的驗證過？'
+            echo
+            echo '- ❌ 未驗證：此 example 只示範 artifact 產生，不代表真實 delivery。'
+            echo
+            echo '## 4. 今天有沒有高風險 gate？'
+            echo
+            echo '- Gate default: local-only artifact, no external send.'
+          } > "$DIGEST"
+
+      - name: Upload digest artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-ai-decision-digest
+          path: logs/daily/*.md

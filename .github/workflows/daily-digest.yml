@@ -1,0 +1,102 @@
+name: Daily AI Decision Digest
+
+# v0.4 — daily readable digest + opt-in delivery.
+#
+# Default behavior:
+#   1. Runs every day at 02:00 UTC (= 10:00 Asia/Taipei).
+#   2. Builds a readable digest from git activity, not an empty scaffold.
+#   3. Validates the 7-question digest structure.
+#   4. Runs repo validation + pytest.
+#   5. Uploads the digest as a workflow artifact.
+#   6. Sends externally only when DELIVERY_PROVIDER is configured.
+#
+# Agent-assisted install:
+#   Ask your coding agent to follow one of:
+#   - docs/install/agent-assisted-install.zh-TW.md
+#   - docs/install/agent-assisted-install.en.md
+#   - docs/install/agent-assisted-install.zh-CN.md
+#   The agent should set repo variable DELIVERY_PROVIDER and the matching
+#   secrets for Slack / Feishu / Telegram / Resend email.
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 2 * * *"
+
+permissions:
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Build readable digest
+        id: build_digest
+        run: |
+          set -euo pipefail
+          mkdir -p logs/daily
+          DATE="${DATE:-$(date -u +%Y-%m-%d)}"
+          OUT="logs/daily/${DATE}-digest.zh-TW.md"
+          python scripts/build_daily_digest.py \
+            --output "$OUT" \
+            --date "$DATE" \
+            --since "24 hours ago" \
+            --until "now" \
+            --timezone "Asia/Taipei"
+          echo "DIGEST_PATH=$OUT" >> "$GITHUB_OUTPUT"
+
+      - name: Validate digest
+        env:
+          DIGEST_PATH: ${{ steps.build_digest.outputs.DIGEST_PATH }}
+        run: |
+          set -euo pipefail
+          python scripts/validate_daily_digest.py "$DIGEST_PATH"
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pytest pyyaml
+
+      - name: Validate repository
+        run: |
+          python scripts/validate.py --mode repo
+
+      - name: Run pytest
+        run: |
+          python -m pytest tests/ -q
+
+      - name: Upload digest as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-ai-decision-digest
+          path: logs/daily/*.md
+          if-no-files-found: error
+          retention-days: 90
+
+      - name: Send digest if delivery is configured
+        env:
+          DELIVERY_PROVIDER: ${{ vars.DELIVERY_PROVIDER || 'none' }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          EMAIL_FROM: ${{ vars.EMAIL_FROM }}
+          EMAIL_TO: ${{ vars.EMAIL_TO }}
+          DIGEST_PATH: ${{ steps.build_digest.outputs.DIGEST_PATH }}
+        run: |
+          set -euo pipefail
+          python scripts/send_daily_digest.py "$DIGEST_PATH"

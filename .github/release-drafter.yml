@@ -1,0 +1,42 @@
+# release-drafter configuration
+# https://github.com/release-drafter/release-drafter
+#
+# release-drafter is run by .github/workflows/release-drafter.yml on every
+# push to main. It auto-drafts the next release notes from merged PRs and
+# updates a GitHub "Draft" release. When a human is ready to ship, they
+# publish the draft (or push a tag — see the workflow file for details).
+
+name-template: "v$RESOLVED_VERSION"
+tag-template: "v$RESOLVED_VERSION"
+version-resolver:
+  major:
+    labels: ["breaking", "major"]
+  minor:
+    labels: ["feature", "enhancement", "minor"]
+  patch:
+    labels: ["bug", "fix", "docs", "chore", "dependencies", "ci", "test"]
+  default: patch
+categories:
+  - title: "🚨 Breaking Changes"
+    labels: ["breaking", "major"]
+  - title: "🚀 New Features"
+    labels: ["feature", "enhancement", "minor"]
+  - title: "🐛 Bug Fixes"
+    labels: ["bug", "fix"]
+  - title: "📚 Documentation"
+    labels: ["docs"]
+  - title: "🧪 Tests"
+    labels: ["test"]
+  - title: "🔧 Maintenance"
+    labels: ["chore", "ci", "dependencies"]
+change-template: "- $TITLE (#$NUMBER) @$AUTHOR"
+template: |
+  ## Changes
+
+  $CHANGES
+
+  ---
+
+  This release was drafted automatically by
+  [release-drafter](https://github.com/release-drafter/release-drafter).
+  Review the changelog and edit the categories above before publishing.

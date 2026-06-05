@@ -1,0 +1,272 @@
+# 任務執行控制日誌（v0.3.1 — 含 Actor metadata）
+
+> v0.3.1 從 v0.3 的改變：
+> - Section 0.5（Actor & Provenance）變成**硬性必填**。`scripts/validate.py` 對
+>   缺 Agent model / session / approver / approval evidence / wall clock
+>   的 v0.3.1 log 會擋下。
+> - **9.5.6 有高風險列時，禁止 self-approval**。Gate 對 9.5.6 表格有
+>   `payment` / `db-schema` / `auth` / `secret` / `production-config` /
+>   `core-calculation` / `external-side-effect` 任一類、又同時在 0.5
+>   寫 `Human approver: self-approved` 的 log 直接擋下。
+> - 新 script `scripts/collect_actor_metadata.py` 自動填
+>   Agent model / session / Wall clock，從 `HERMES_AGENT_MODEL` /
+>   `HERMES_AGENT_SESSION` / `HERMES_TASK_ID` 環境變數抓，agent 一行
+>   指令就能產出完整的 0.5 區塊。
+
+## 0. 語言與讀者設定
+
+| 欄位 | 值 |
+|---|---|
+| 輸出語言 | zh-TW / zh-CN / en / ja / 自訂 |
+| 讀者 | 創辦人 / operator / 工程師 / 客戶 / 內部團隊 |
+| 語氣 | 白話 / 技術 / 高層摘要 / 客戶可讀 |
+| 技術名詞是否翻成人話 | 是 / 否 |
+
+## 0.5 Actor & Provenance（v0.3.1 — 強制必填）
+
+> **v0.3.1**：六個欄位全部必填。任一欄位為空就會被驗證器擋下。
+>
+> **9.5.6 有高風險列時，禁止 self-approval**。如果 9.5.6 表格有
+> `payment` / `db-schema` / `auth` / `secret` / `production-config` /
+> `core-calculation` / `external-side-effect` 任一類的列，
+> `Human approver` 必須是 GitHub handle（例如 `@maintainer`），不能是
+> `self-approved`。
+>
+> **Approval evidence** 必須是 URL —— PR review URL、issue 連結、
+> 會議記錄的決策連結，或 `no human in loop`（這會強迫 high-risk check）。
+>
+> **Wall clock** 欄位必須是 ISO-8601 timestamp。Agent 透過
+> `scripts/collect_actor_metadata.py` 自動填，人類 reviewer 看到錯可以改。
+
+| 欄位 | 值 | 必填？ | 驗證規則 |
+|---|---|---|---|
+| Agent model       |  | 是 | 非空 |
+| Agent session     |  | 是 | 非空 |
+| Human approver    |  | 是 | 非空；9.5.6 有高風險時禁止 `self-approved` |
+| Approval evidence |  | 是 | 非空；URL 或 `no human in loop` |
+| Wall clock start  |  | 是 | ISO-8601 |
+| Wall clock end    |  | 是 | ISO-8601；必須 ≥ start |
+
+自動填法（agent 端）：
+
+```bash
+$ python scripts/collect_actor_metadata.py
+
+## 0.5 Actor & Provenance（自動填）
+
+| 欄位 | 值 |
+|---|---|
+| Agent model       | minimax-m3 |
+| Agent session     | 2026-06-04T22:00:00Z-7a3b1c |
+| Human approver    |  |
+| Approval evidence |  |
+| Wall clock start  | 2026-06-04T22:00:00Z |
+| Wall clock end    | 2026-06-04T22:05:30Z |
+```
+
+人類審查時填 `Human approver` 跟 `Approval evidence`。
+
+## 1. 任務目標
+
+### 時間軸
+
+| 欄位 | 值 |
+|---|---|
+| 任務開始時間 |  |
+| 最後更新時間 |  |
+
+### 目標
+-
+
+### 不做什麼 / 範圍外
+-
+
+### 成功標準
+- [ ]
+
+## 2. 使用者明確要求
+
+這裡只寫使用者明確講出的要求，不要混入 AI 自己補的推論。
+
+-
+
+## 3. 待釐清問題與假設
+
+| 問題 / 模糊處 | 目前假設 | 如果假設錯了，修改成本（低/中/高） | 是否需要使用者確認 |
+|---|---|---:|---|
+|  |  |  |  |
+| 範例：這次是否會碰 production config？ | 不會，只限 local / staging | 高 | 若要碰 production，必須先確認 |
+
+## 4. AI 自行決定
+
+這裡列出 AI 在使用者沒有明講時，自己做出的選擇。
+
+| 決定 | 為什麼這樣做 | 考慮過的替代方案 | 風險 |
+|---|---|---|---|
+|  |  |  |  |
+
+## 5. 規格偏離
+
+這裡列出「使用者原本要 A，但實作變成 B」的地方。
+
+| 偏離項目 | 原因 | 使用者是否同意 | 是否需要後續處理 |
+|---|---|---|---|
+| 目前沒有 |  |  |  |
+
+## 6. Surgical Change 追溯
+
+每個改動都應該能追溯到使用者需求。
+
+| 檔案 / 區域 | 改了什麼 | 對應哪個需求 | 是否必要 | 備註 |
+|---|---|---|---|---|
+|  |  |  |  |  |
+
+## 7. 取捨
+
+| 選擇 | 好處 | 成本 / 代價 | 什麼時候要重新檢查 |
+|---|---|---|---|
+|  |  |  |  |
+
+## 8. 高風險 / 不可逆操作檢查
+
+請逐項標記。
+
+- [ ] 刪除或覆寫使用者資料
+- [ ] 修改資料庫 schema 或 migration
+- [ ] 部署到 production 或修改 production config
+- [ ] 修改付款、金流、訂閱、財務邏輯
+- [ ] 修改登入、權限、授權、secret
+- [ ] 修改核心計算或商業邏輯
+- [ ] 執行不可逆外部副作用
+- [ ] 超出需求的大範圍重構
+- [ ] 以上皆無
+
+如果任何高風險項目被勾選，必須停下來，先取得使用者明確確認。
+
+## 9. 驗證結果
+
+### 9.1 回報可信度
+- [ ] ✅ 已真實驗證：有真實工具輸出、測試、live smoke 或 production check 支撐
+- [ ] ⚠️ 部分驗證：只驗證一部分，或缺少 live / production 證據
+- [ ] ❌ 未驗證：只是推論、閱讀文件，或尚未實際執行檢查
+
+### 9.2 測試類型標籤
+- [ ] mock：只代表模擬通過
+- [ ] unit：單元測試通過
+- [ ] integration：整合測試通過
+- [ ] live smoke：真實 CLI / API / 服務最小可用檢查通過
+- [ ] production verified：production 環境已確認
+
+### 9.3 已驗證
+| 檢查 | 指令 / 方法 | 結果 |
+|---|---|---|
+|  |  |  |
+
+### 9.4 未驗證
+| 區域 | 為什麼未驗證 | 風險 |
+|---|---|---|
+|  |  |  |
+
+## 9.5 證據層（v0.3）
+
+> 目標：被監督的一方（AI）不再同時也是報告的一方（Log）。
+> 每個宣稱都綁定到人類可重新執行的客觀物件。
+
+### 9.5.1 改動檔案（客觀）
+| 路徑 | 狀態 | 增 / 減行數 | Hash（選填） |
+|---|---|---:|---|
+|  | 新增 / 修改 / 刪除 |  |  |
+
+填法：
+```bash
+git diff --name-status <BASE_REF>..<HEAD_SHA>
+git diff --numstat <BASE_REF>..<HEAD_SHA>
+```
+
+### 9.5.2 Diff 摘要（逐檔）
+| 路徑 | 改了什麼（白話） | 公開 API？ | 動到 schema？ |
+|---|---|---|---|
+|  |  | 是 / 否 | 是 / 否 |
+
+### 9.5.3 測試結果（貼原始輸出，不要寫「通過」兩個字）
+| 套件 | 指令 | 結果 | 通過 / 失敗 / 跳過 |
+|---|---|---|---|
+|  |  | （貼實際輸出） |  |
+
+填法：
+```bash
+pytest -q 2>&1 | tail -40 > evidence/test-result.txt
+```
+
+### 9.5.4 驗證類型
+每個宣稱都要勾出「實際上跑到哪一層」。不要混用。
+
+- [ ] mock：只代表模擬通過 —— **不可作為 production gate**
+- [ ] unit：單元測試通過
+- [ ] integration：整合測試通過
+- [ ] live smoke：真實 CLI / API / 服務被實際跑過
+- [ ] production verified：production 環境被直接確認
+
+> 沒有標類型的「通過」不算是驗證，只是自我宣稱。
+
+### 9.5.5 Commit Hash / PR 連結
+- Commit hash：`<HEAD_SHA>`
+- Branch：`<BRANCH>`
+- PR 連結：`<URL>`
+- 重新驗證指令：`git checkout <BRANCH> && git rev-parse HEAD`
+
+### 9.5.6 高風險接觸點（v0.3 — 自動偵測，列不可刪）
+
+> v0.3 改變：本表由 `scripts/detect_high_risk_touchpoints.py` 從工作樹
+> + staged changes 自動產生，比對 `config/high_risk_patterns.yml`。
+>
+> **v0.3.1 補充**：本表若有任何列，Section 0.5 必須列出非 self 的人類
+> approver。否則驗證器擋下。
+
+| 路徑 | 接觸類型 | 為什麼這是高風險 | 備註（選填） |
+|---|---|---|---|
+|  |  |  |  |
+
+### 9.5.7 回滾證據（v0.3 — 真的跑過）
+
+> v0.3 改變：「可回滾」三個字不算證據。本表由
+> `scripts/collect_rollback_evidence.py` 在 throwaway worktree 跑
+> `git revert --no-commit --no-edit <HEAD>`，並記錄真實 exit code 跟
+> conflict markers。
+>
+> 驗證器在以下情況擋下：
+> 1. 整段不見
+> 2. `Exit code` 不是 0，或 `Conflict markers` 不是 0
+> 3. 非 trivial task 卻只填 `n/a`
+
+| 回滾步驟 | 指令 | Exit code | Conflict markers | 驗證方式 |
+|---|---|---:|---|---|
+| Revert commit | `git revert --no-commit --no-edit <HEAD_SHA>` | 0 | 0 unmerged, 0 .rej | 在 HEAD~1 的 throwaway worktree 上跑 |
+
+填法：
+```bash
+python scripts/collect_rollback_evidence.py --sha <HEAD_SHA>
+```
+
+## 10. 回滾計畫
+
+如果這次變更出問題，回滾方式：
+
+- Commit / branch：
+- 要還原的檔案：
+- 資料恢復步驟：
+- 設定回滾步驟：
+
+## 11. 給人類審查的最終摘要
+
+| 項目 | 摘要 |
+|---|---|
+| 改了什麼 |  |
+| 沒改什麼 |  |
+| AI 自行決定 |  |
+| 規格偏離 |  |
+| 已驗證 |  |
+| 未驗證 |  |
+| 回滾方式 |  |
+| 審查者 | <github handle> |
+| 審查證據 | <URL 或 "no human in loop"> |

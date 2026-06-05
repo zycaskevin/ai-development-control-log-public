@@ -1,0 +1,110 @@
+# High-Risk Touchpoint patterns used by scripts/detect_high_risk_touchpoints.py
+# to auto-flag files in the v0.3 Control Log's Section 9.5.6.
+#
+# Rules:
+#   - each entry has a category, one or more glob/path patterns, and
+#     a one-line reason
+#   - the detector treats any path that matches AT LEAST ONE pattern in
+#     a category as a high-risk touchpoint for that category
+#   - a file can be flagged in multiple categories (e.g. a Prisma
+#     migration under payments/ is both "db-schema" and "payment")
+#   - path matching is case-sensitive on Linux and uses Path.match
+#     semantics (recursive with `**`, single-segment with `*`)
+
+version: 1
+
+categories:
+  - id: db-schema
+    reason: Database schema or migration — rollback needs explicit down-migration
+    patterns:
+      - "**/migrations/**"
+      - "**/migration/**"
+      - "**/alembic/**"
+      - "**/prisma/**"
+      - "**/schema.prisma"
+      - "**/schema.sql"
+      - "**/models.py"
+      - "**/models/*.py"
+      - "**/db/schema/**"
+
+  - id: payment
+    reason: Payment, billing, or financial logic — incident blast radius is money
+    patterns:
+      - "**/payment*/**"
+      - "**/billing*/**"
+      - "**/invoice*/**"
+      - "**/stripe*/**"
+      - "**/subscription*/**"
+      - "**/pricing*/**"
+      - "**/tax*/**"
+      - "**/*Payment*"
+      - "**/*Billing*"
+      - "**/*Invoice*"
+
+  - id: auth
+    reason: Authentication, authorization, or permission — wrong code is a security CVE
+    patterns:
+      - "**/auth*/**"
+      - "**/permission*/**"
+      - "**/rbac*/**"
+      - "**/oauth*/**"
+      - "**/jwt*/**"
+      - "**/*Auth*"
+      - "**/middleware/auth*"
+      - "**/guards/**"
+
+  - id: secret
+    reason: Secret, key, or credential — leaking one is a security incident
+    patterns:
+      - "**/.env*"
+      - "**/secrets/**"
+      - "**/credentials/**"
+      - "**/*secret*"
+      - "**/*Secret*"
+      - "**/*keyring*"
+      - "**/*.pem"
+      - "**/*.key"
+      - "**/id_rsa*"
+
+  - id: production-config
+    reason: Production configuration or environment-specific file
+    patterns:
+      - "**/prod*"
+      - "**/production*"
+      - "**/*.prod.*"
+      - "**/*.production.*"
+      - "**/deploy/**"
+      - "**/k8s/**"
+      - "**/terraform/**"
+      - "**/ansible/**"
+
+  - id: core-calculation
+    reason: Core business calculation — wrong code changes the product's output
+    patterns:
+      - "**/core/**"
+      - "**/domain/**"
+      - "**/calculations/**"
+      - "**/engine/**"
+      - "**/lib/calc*/**"
+
+  - id: external-side-effect
+    reason: "External side effect: deploy, webhook, cutover, batch"
+    patterns:
+      - "**/deploy*"
+      - "**/webhook*/**"
+      - "**/cutover*/**"
+      - "**/migration-job*/**"
+      - "**/batch*/**"
+      - "**/cron*/**"
+      - "**/scheduled*/**"
+
+# Files that should NEVER be flagged, even if they match a pattern above.
+# (e.g. tests for high-risk code are not themselves high-risk to ship.)
+exempt_paths:
+  - "**/tests/**"
+  - "**/test/**"
+  - "**/__tests__/**"
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/docs/**"
+  - "**/examples/**"

@@ -1,0 +1,16 @@
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Local agent scratch
+.hermes/
+.env
+
+# Local scripts write here, do not commit
+logs/daily/

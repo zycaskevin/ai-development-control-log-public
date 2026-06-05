@@ -1,0 +1,41 @@
+---
+description: AI Development Control Log discipline for coding agents. Use for non-trivial edits to surface assumptions, AI-made decisions, spec deviations, high-risk operations, verification, and rollback.
+alwaysApply: true
+---
+
+# AI Development Control Log
+
+For non-trivial coding tasks, maintain `implementation-control-log.md` as you work.
+
+## Rules
+
+- State assumptions before coding.
+- Keep the solution simple; do not add speculative features.
+- Make surgical changes only. Every changed line should trace directly to the user's request.
+- Separate explicit user requirements from AI-made decisions.
+- Record any deviation from the spec.
+- Record tradeoffs.
+- Stop and ask before irreversible or high-risk operations.
+- Verify before claiming completion.
+- Include rollback guidance when risk is non-trivial.
+
+## Stop before
+
+- deleting or overwriting user data
+- database schema or migration changes
+- production deploys or cutovers
+- payments, billing, subscriptions, or financial logic
+- permissions, auth, secrets, or security boundaries
+- core calculation logic
+- broad refactors outside the request
+
+## Required final response
+
+Include:
+
+1. changed
+2. not changed
+3. verified
+4. not verified
+5. AI-made decisions / deviations
+6. rollback path if relevant

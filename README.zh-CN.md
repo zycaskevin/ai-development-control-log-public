@@ -1,6 +1,6 @@
 # AI Development Control Log
 
-[![validate](https://github.com/zycaskevin/ai-development-control-log/actions/workflows/validate.yml/badge.svg)](https://github.com/zycaskevin/ai-development-control-log/actions/workflows/validate.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![validate](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml/badge.svg)](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > 我不一定看得懂 AI 写的每一行 code。
 > 但我一定要看得懂，它什么时候偷偷替我做主。

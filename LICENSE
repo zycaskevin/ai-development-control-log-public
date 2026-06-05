@@ -1,13 +1,28 @@
-MIT License
+AI Development Control Log Licensing
 
 Copyright (c) 2026 Arthur Liao
 
+This repository uses a split license:
+
+1. Code and automation artifacts are licensed under the MIT License.
+2. Documentation, templates, examples, and articles are licensed under Creative Commons Attribution 4.0 International (CC BY 4.0).
+
+## MIT License — code and automation
+
+Applies to:
+
+- `scripts/`
+- `tests/`
+- `.github/workflows/`
+- machine-readable agent skill/package metadata and automation glue
+- other source-code or executable automation files unless a file says otherwise
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+of this software and associated documentation files covered by the MIT License
+(the "Software"), to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom
+the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
@@ -19,3 +34,26 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+## Creative Commons Attribution 4.0 International — docs and templates
+
+Applies to:
+
+- `README*.md`
+- `docs/`
+- `templates/`
+- `examples/`
+- `articles/`
+- explanatory prose, diagrams, prompts, and governance protocol text unless a file says otherwise
+
+You may share and adapt these materials for any purpose, including commercial
+use, provided that you give appropriate credit, provide a link to the license,
+and indicate if changes were made.
+
+License text: https://creativecommons.org/licenses/by/4.0/
+SPDX identifier: CC-BY-4.0
+
+Suggested attribution:
+
+"AI Development Control Log" by Arthur Liao, licensed under CC BY 4.0.
+https://github.com/zycaskevin/ai-development-control-log-public

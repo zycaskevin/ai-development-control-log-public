@@ -1,6 +1,6 @@
 # AI Development Control Log
 
-[![validate](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml/badge.svg)](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![validate](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml/badge.svg)](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml) [![License: MIT + CC BY 4.0](https://img.shields.io/badge/License-MIT%20%2B%20CC--BY--4.0-blue.svg)](LICENSE)
 
 > 我不一定看得懂 AI 写的每一行 code。
 > 但我一定要看得懂，它什么时候偷偷替我做主。
@@ -449,4 +449,9 @@ GitHub Actions 也会在 push / pull request 时执行 repo mode 验证与测试
 
 ## License
 
-MIT
+双授权：
+
+- 程式码与自动化脚本：MIT
+- 文档、模板、范例、文章：CC BY 4.0
+
+建议署名：`AI Development Control Log` by Arthur Liao, licensed under CC BY 4.0.

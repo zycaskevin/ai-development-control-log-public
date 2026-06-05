@@ -1,6 +1,6 @@
 # AI Development Control Log
 
-[![validate](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml/badge.svg)](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![validate](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml/badge.svg)](https://github.com/zycaskevin/ai-development-control-log-public/actions/workflows/validate.yml) [![License: MIT + CC BY 4.0](https://img.shields.io/badge/License-MIT%20%2B%20CC--BY--4.0-blue.svg)](LICENSE)
 
 > I may not understand every line of code an AI agent writes.
 > But I need to know when it quietly made a decision for me.
@@ -411,4 +411,9 @@ GitHub Actions runs repo-mode validation and the unit tests on push and pull req
 
 ## License
 
-MIT
+Split license:
+
+- Code and automation: MIT
+- Documentation, templates, examples, and articles: CC BY 4.0
+
+Suggested attribution: `AI Development Control Log` by Arthur Liao, licensed under CC BY 4.0.

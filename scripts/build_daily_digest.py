@@ -119,7 +119,7 @@ def _bullet_lines(items: Iterable[str], empty: str, limit: int = 12) -> str:
 
 def _commit_lines(commits: list[CommitInfo]) -> str:
     if not commits:
-        return '- 昨天沒有偵測到新的 commit。這不是代表 AI 沒有工作，只代表這個 repo 沒有新的 git 證據。'
+        return '- 沒有新的 commit。人話：這個 repo 昨天沒有留下任何可審核的程式改動證據。'
     return '\n'.join(
         f'- `{c.sha}` — {c.subject}（{c.author}，{c.date}）'
         for c in commits[:12]
@@ -285,8 +285,28 @@ def render_digest(
     """Render a zh-TW digest that passes validate_daily_digest.py."""
     commit_count = len(activity.commits)
     risk_paths = detect_high_risk_paths(activity.touched_paths)
-    risk_status = '有高風險路徑，需要人看' if risk_paths else '未從檔名偵測到高風險路徑'
+    risk_status = '有高風險路徑，需要人看' if risk_paths else '0 件'
     commit_summary = f'{commit_count} 個 commit' if commit_count else '沒有新的 commit'
+    action_line = (
+        f'要看：{commit_summary}；先看「高風險操作」與「AI 自己決定」。'
+        if commit_count or risk_paths
+        else '不用處理：今天沒有新的 repo 改動，也沒有偵測到高風險路徑。'
+    )
+    decision_line = (
+        '需要人工判斷。'
+        if commit_count or risk_paths
+        else '今天沒有可判斷的新決策。'
+    )
+    evidence_line = (
+        '證據：GitHub 近 24 小時 commit / 改動檔案 / task logs。'
+        if commit_count or risk_paths
+        else '證據：GitHub 近 24 小時沒有新的 commit。'
+    )
+    next_action = (
+        '檢查下方 §3/§5，再決定要不要介入。'
+        if commit_count or risk_paths
+        else '不用點開細看；除非你昨天其實有要求 AI 做事，但這裡沒記到。'
+    )
     rollback_line = (
         f'如需回退，先看 commit 範圍，再用 `git revert` 逐筆回退；最新 commit 是 `{activity.commits[0].sha}`。'
         if activity.commits
@@ -306,18 +326,11 @@ def render_digest(
 
 ## 📋 0. 1 分鐘版（給老闆看）
 
-- 今天狀態：{commit_summary}。
-- 高風險提醒：{risk_status}。
-- 最需要看的地方：先看「AI 自己決定了什麼」和「有沒有碰到高風險操作」。
-- 這份報告來源：git commit / touched files / workflow 驗證，不是 AI 自我吹噓。
-- 時區：{timezone}。統計區間：{activity.since} → {activity.until}。
-
-## 0. 語言與讀者設定
-
-- 語言：繁體中文 zh-TW。
-- 讀者：非工程背景創業者 / 產品負責人 / AI agent 管理者。
-- 語氣：白話、短、先講風險。
-- 技術名詞：能翻成人話就翻成人話。
+- 結論：{action_line}
+- AI 決策重點：{decision_line}
+- 高風險操作：{risk_status}。
+- 你要做什麼：{next_action}
+- {evidence_line}
 
 ## 1. AI 做了什麼？
 

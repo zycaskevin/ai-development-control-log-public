@@ -29,8 +29,9 @@ def test_render_digest_with_no_activity_is_still_readable_and_valid(tmp_path):
     )
 
     assert '# 每日 AI 決策摘要 — 2026-06-05' in text
-    assert '昨天沒有偵測到新的 commit' in text
-    assert '不是代表 AI 沒有工作' in text
+    assert '不用處理：今天沒有新的 repo 改動' in text
+    assert '你要做什麼：不用點開細看' in text
+    assert '沒有留下任何可審核的程式改動證據' in text
     assert _validate_rendered_digest(tmp_path, text) == []
 
 
